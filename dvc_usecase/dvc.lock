@@ -1,0 +1,59 @@
+schema: '2.0'
+stages:
+  prepare:
+    cmd: python src/prepare.py
+    deps:
+    - path: src/prepare.py
+      md5: a600f1d48d563cc900bd6f3cc8e42bb3
+      size: 1465
+    outs:
+    - path: data/prepared
+      md5: 6201550ec5cb8338f2bc93e118b13c04.dir
+      size: 1139286
+      nfiles: 1
+  train:
+    cmd: python src/train.py data/prepared model_dt.pkl
+    deps:
+    - path: data/prepared
+      md5: 6201550ec5cb8338f2bc93e118b13c04.dir
+      size: 1139286
+      nfiles: 1
+    - path: src/train.py
+      md5: 83115aa74b129d1c03b066f85a6798d4
+      size: 1340
+    params:
+      params.yaml:
+        train:
+          test_size: 0.2
+          random_state: 100
+          criterion: gini
+          max_depth: 5
+          min_samples_leaf: 5
+    outs:
+    - path: data/test
+      md5: b7ff843af2886df10d6d0a46cbbd9d6e.dir
+      size: 625561
+      nfiles: 2
+    - path: model_dt.pkl
+      md5: a86e322ee942c8fdfbf6b91ff6146803
+      size: 25265
+  evaluate:
+    cmd: python src/evaluate.py model_dt.pkl data/test accuracy_file.json plots_file.json
+    deps:
+    - path: data/test
+      md5: b7ff843af2886df10d6d0a46cbbd9d6e.dir
+      size: 625561
+      nfiles: 2
+    - path: model_dt.pkl
+      md5: a86e322ee942c8fdfbf6b91ff6146803
+      size: 25265
+    - path: src/evaluate.py
+      md5: 1a80ac959862e50828b95cd9c8e10e96
+      size: 807
+    outs:
+    - path: accuracy_file.json
+      md5: bd398d30112afae52464d4f2f0b5d64d
+      size: 26
+    - path: plots_file.json
+      md5: 50a607eca99a627d75fdda79a4516f6a
+      size: 43
